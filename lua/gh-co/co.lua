@@ -6,38 +6,76 @@ local function isComment(pathPattern)
   return string.match(pathPattern, '#') ~= nil
 end
 
-local function isMatch(pathPattern, filePath)
-  if pathPattern == nil then return false end
-  if isComment(pathPattern) then return false end
-
-  return string.match(pathPattern, filePath) ~= nil
+local function buildEscapedPattern(rawPattern)
+  return string.gsub(rawPattern, "%-", "%%-")
 end
 
-local function extractCodeowners(str)
-  local owners = {}
-  for _, owner in ipairs(vim.split(str, ",")) do
-    owners.insert(owner)
+local function isMatch(filePath, pathPattern)
+  if pathPattern == nil or pathPattern == "" then return false end
+  if isComment(pathPattern) then return false end
+
+  return string.match(filePath, buildEscapedPattern(pathPattern)) ~= nil
+end
+
+local function collectCodeowners(group)
+  local list = {}
+
+  for i = 2, #group, 1 do
+    table.insert(list, group[i])
   end
 
-  return owners
+  return list
+end
+
+local function sortMatches(matches)
+  table.sort(matches, function(a, b)
+    return #a.pathPattern > #b.pathPattern
+  end)
+end
+
+local function containsValue(list, value)
+  for i = 1, #list do
+    if list[i] == value then return true end
+  end
+
+  return false
+end
+
+local function mapCodeowners(matches)
+  local list = {}
+
+  for _, item in ipairs(matches) do
+    for _, owner in ipairs(item.codeowners) do
+      if containsValue(list, owner) == false then
+        table.insert(list, owner)
+      end
+    end
+  end
+
+  return list
 end
 
 CO.matchFileToCodeowner = function(filePath)
   local lines = FS.openCodeownersFileAsLines()
 
-  local codeowners = nil
+  local matches = {}
   for line, _, __ in lines do
     local split = vim.split(line, " ")
     local pathPattern = split[1]
-    local owners = split[2]
 
-    if isMatch(pathPattern, filePath) then
-      codeowners = extractCodeowners(owners)
-      break
+    if isMatch(filePath, pathPattern) then
+      local codeowners = collectCodeowners(split)
+      table.insert(matches, { pathPattern = pathPattern, codeowners = codeowners })
     end
   end
 
-  return codeowners or {}
+  if #matches == 0 then return {} end
+
+  sortMatches(matches)
+
+  local codeownersList = mapCodeowners(matches)
+
+  return codeownersList
 end
 
 return CO

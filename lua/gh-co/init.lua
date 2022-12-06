@@ -17,7 +17,11 @@ end
 
 M.who = function()
   local filePath = FS.getFilePath()
-  CO.matchFileToCodeowner(filePath)
+  local owners = CO.matchFileToCodeowner(filePath)
+
+  for _, owner in ipairs(owners) do
+    print(owner)
+  end
 end
 
 M.init = function()

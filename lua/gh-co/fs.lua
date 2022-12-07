@@ -43,6 +43,9 @@ end
 
 FS.getCodeownersFilePath = function()
   local rootDirName = getRootDirectoryName(getRealFilePath(FS.getFilePath()))
+
+  if rootDirName == nil then return nil end
+
   local _, rootDirStatus = vim.fs.dir(rootDirName)
 
   assert(rootDirStatus, "Not able to detect project root directory. Maybe you should run nvim from the root of the project.")

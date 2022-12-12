@@ -8,7 +8,11 @@ M.healthcheck = function()
 end
 
 M.showCodeownersFile = function()
-  print(FS.openCodeownersFile())
+  local path = FS.getCodeownersFilePath()
+
+  if path == nil then return end
+
+  vim.cmd.edit(path)
 end
 
 M.status = function()

@@ -41,6 +41,18 @@ FS.getFilePath = function()
   return vim.api.nvim_buf_get_name(0) or nil
 end
 
+FS.getFilePaths = function()
+  local buffers = {}
+
+  for buffer = 1, vim.fn.bufnr('$') do
+    if vim.fn.buflisted(buffer) == 1 then
+      table.insert(buffers, vim.api.nvim_buf_get_name(buffer))
+    end
+  end
+
+  return buffers
+end
+
 FS.getCodeownersFilePath = function()
   local rootDirName = getRootDirectoryName(getRealFilePath(FS.getFilePath()))
 

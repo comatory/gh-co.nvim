@@ -21,7 +21,19 @@ end
 
 M.who = function()
   local filePath = FS.getFilePath()
-  local owners = CO.matchFileToCodeowner(filePath)
+  local owners = CO.matchFilesToCodeowner({ filePath })
+
+  str = ""
+  for _, owner in ipairs(owners) do
+    str = str .. " " .. owner
+  end
+
+  return str
+end
+
+M.whos = function()
+  local filePaths = FS.getFilePaths()
+  local owners = CO.matchFilesToCodeowner(filePaths)
 
   str = ""
   for _, owner in ipairs(owners) do
@@ -33,7 +45,16 @@ end
 
 M.whoPrint = function()
   local filePath = FS.getFilePath()
-  local owners = CO.matchFileToCodeowner(filePath)
+  local owners = CO.matchFilesToCodeowner({ filePath })
+
+  for _, owner in ipairs(owners) do
+    print(owner)
+  end
+end
+
+M.whosPrint = function()
+  local filePaths = FS.getFilePaths()
+  local owners = CO.matchFilesToCodeowner(filePaths)
 
   for _, owner in ipairs(owners) do
     print(owner)
@@ -50,6 +71,8 @@ M.init = function()
   vim.cmd("command! -bang -nargs=0 GhCoShowFile :lua require('gh-co').showCodeownersFile()")
   vim.cmd("command! -bang -nargs=0 GhCoWho :lua require('gh-co').who()")
   vim.cmd("command! -bang -nargs=0 GhCoWhoPrint :lua require('gh-co').whoPrint()")
+  vim.cmd("command! -bang -nargs=0 GhCoWhos :lua require('gh-co').whos()")
+  vim.cmd("command! -bang -nargs=0 GhCoWhosPrint :lua require('gh-co').whosPrint()")
 end
 
 return M

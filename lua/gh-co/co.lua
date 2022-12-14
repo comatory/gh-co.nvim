@@ -55,7 +55,7 @@ local function mapCodeowners(matches)
   return list
 end
 
-CO.matchFileToCodeowner = function(filePath)
+CO.matchFilesToCodeowner = function(filePaths)
   local lines = FS.openCodeownersFileAsLines()
 
   local matches = {}
@@ -63,9 +63,11 @@ CO.matchFileToCodeowner = function(filePath)
     local split = vim.split(line, " ")
     local pathPattern = split[1]
 
-    if isMatch(filePath, pathPattern) then
-      local codeowners = collectCodeowners(split)
-      table.insert(matches, { pathPattern = pathPattern, codeowners = codeowners })
+    for _, filePath in ipairs(filePaths) do
+      if isMatch(filePath, pathPattern) then
+        local codeowners = collectCodeowners(split)
+        table.insert(matches, { pathPattern = pathPattern, codeowners = codeowners })
+      end
     end
   end
 

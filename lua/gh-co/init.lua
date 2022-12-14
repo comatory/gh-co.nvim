@@ -4,6 +4,25 @@ local G = require('gh-co.git')
 
 local M = {}
 
+function getBufferHandleByName(name)
+  for buffer = 1, vim.fn.bufnr('$') do
+    local bufferName = vim.api.nvim_buf_get_name(buffer)
+
+    if bufferName == name then return buffer end
+  end
+end
+
+function writeBufferOwnerContents(buffer, owners)
+  local lineCount = vim.api.nvim_buf_line_count(buffer)
+  vim.api.nvim_buf_set_lines(buffer, 0, lineCount, false, {})
+
+  for index, owner in ipairs(owners) do
+    vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { owner })
+  end
+
+  vim.api.nvim_set_current_buf(buffer)
+end
+
 M.healthcheck = function()
   print('gh-co.nvim is OK!')
 end
@@ -36,40 +55,34 @@ M.whos = function()
   local filePaths = FS.getFilePaths()
   local owners = CO.matchFilesToCodeowner(filePaths)
 
-  local buffer = vim.api.nvim_create_buf(true, true)
+  local existingBuffer = getBufferHandleByName('gh-co://whos')
 
-  if buffer == 0 then return end
+  if existingBuffer then
+    writeBufferOwnerContents(existingBuffer, owners)
+  else
+    local buffer = vim.api.nvim_create_buf(true, true)
+    if buffer == 0 then return end
 
-  vim.api.nvim_buf_set_name(buffer, 'gh-co://whos')
-
-  local lineCount = vim.api.nvim_buf_line_count(buffer)
-  vim.api.nvim_buf_set_lines(buffer, 0, lineCount, false, {})
-
-  for index, owner in ipairs(owners) do
-    vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { owner })
+    vim.api.nvim_buf_set_name(buffer, 'gh-co://whos')
+    writeBufferOwnerContents(buffer, owners)
   end
-
-  vim.api.nvim_set_current_buf(buffer)
 end
 
 M.gitWho = function(sha)
   local filePaths = G.getAffectedFiles(sha)
   local owners = CO.matchFilesToCodeowner(filePaths)
 
-  local buffer = vim.api.nvim_create_buf(true, true)
+  local existingBuffer = getBufferHandleByName('gh-co://git-who')
 
-  if buffer == 0 then return end
+  if existingBuffer then
+    writeBufferOwnerContents(existingBuffer, owners)
+  else
+    local buffer = vim.api.nvim_create_buf(true, true)
+    if buffer == 0 then return end
 
-  vim.api.nvim_buf_set_name(buffer, 'gh-co://git-who')
-
-  local lineCount = vim.api.nvim_buf_line_count(buffer)
-  vim.api.nvim_buf_set_lines(buffer, 0, lineCount, false, {})
-
-  for index, owner in ipairs(owners) do
-    vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { owner })
+    vim.api.nvim_buf_set_name(buffer, 'gh-co://git-who')
+    writeBufferOwnerContents(buffer, owners)
   end
-
-  vim.api.nvim_set_current_buf(buffer)
 end
 
 M.init = function()

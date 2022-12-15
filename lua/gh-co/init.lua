@@ -4,22 +4,41 @@ local G = require('gh-co.git')
 
 local M = {}
 
+function createNamedBuffer(name)
+  local buffer = vim.api.nvim_create_buf(true, true)
+
+  if buffer == 0 then return nil end
+
+  vim.api.nvim_buf_set_name(buffer, name)
+
+  return buffer
+end
+
 function getBufferHandleByName(name)
   for buffer = 1, vim.fn.bufnr('$') do
-    local bufferName = vim.api.nvim_buf_get_name(buffer)
+    if vim.api.nvim_buf_is_valid(buffer) then
+      local bufferName = vim.api.nvim_buf_get_name(buffer)
 
-    if bufferName == name then return buffer end
+      if bufferName == name then return buffer end
+    end
   end
 end
 
 function writeBufferOwnerContents(buffer, owners)
   local lineCount = vim.api.nvim_buf_line_count(buffer)
+  vim.api.nvim_buf_set_option(buffer, 'modifiable', true)
   vim.api.nvim_buf_set_lines(buffer, 0, lineCount, false, {})
 
-  for index, owner in ipairs(owners) do
-    vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { owner })
+  if #owners > 0 then
+    for index, owner in ipairs(owners) do
+      vim.api.nvim_buf_set_lines(buffer, index - 1, index, false, { owner })
+    end
+  else
+    vim.api.nvim_buf_set_lines(buffer, 0, 1, false, { '[no owners detected]' })
+
   end
 
+  vim.api.nvim_buf_set_option(buffer, 'modifiable', false)
   vim.api.nvim_set_current_buf(buffer)
 end
 
@@ -60,10 +79,10 @@ M.whos = function()
   if existingBuffer then
     writeBufferOwnerContents(existingBuffer, owners)
   else
-    local buffer = vim.api.nvim_create_buf(true, true)
+    local buffer = createNamedBuffer('gh-co://whos')
+
     if buffer == 0 then return end
 
-    vim.api.nvim_buf_set_name(buffer, 'gh-co://whos')
     writeBufferOwnerContents(buffer, owners)
   end
 end
@@ -77,10 +96,10 @@ M.gitWho = function(sha)
   if existingBuffer then
     writeBufferOwnerContents(existingBuffer, owners)
   else
-    local buffer = vim.api.nvim_create_buf(true, true)
+    local buffer = createNamedBuffer('gh-co://git-who')
+
     if buffer == 0 then return end
 
-    vim.api.nvim_buf_set_name(buffer, 'gh-co://git-who')
     writeBufferOwnerContents(buffer, owners)
   end
 end

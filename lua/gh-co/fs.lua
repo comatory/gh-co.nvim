@@ -58,13 +58,13 @@ FS.getCodeownersFilePath = function()
 
   if rootDirName == nil then return nil end
 
-  local _, rootDirStatus = vim.fs.dir(rootDirName)
+  local rootDirContents = vim.fs.dir(rootDirName)
 
-  assert(rootDirStatus, "Not able to detect project root directory. Maybe you should run nvim from the root of the project.")
+  assert(rootDirContents, "Not able to detect project root directory. Maybe you should run nvim from the root of the project.")
 
   local githubDirName = nil
   local docsDirName = nil
-  for name, kind in vim.fs.dir(rootDirName) do
+  for name, kind in rootDirContents do
     if hasGithubDirectory(name, kind) then
       githubDirName = name
     end
@@ -75,15 +75,15 @@ FS.getCodeownersFilePath = function()
   end
 
   local codeownerDirName = rootDirName .. "/" .. githubDirName or docsDirName
-  local _, codeownerDirStatus = vim.fs.dir(codeownerDirName)
+  local codeownerDirContents = vim.fs.dir(codeownerDirName)
 
   assert(
-    codeownerDirStatus,
+    codeownerDirContents,
     "Directory " .. codeownerDirName .. " does not seem to exist."
   )
 
   local codeownerFileName = nil
-  for name, kind in vim.fs.dir(codeownerDirName) do
+  for name, kind in codeownerDirContents do
     if hasCodeownersFile(name, kind) then
       codeownerFileName = name
       break

@@ -1,6 +1,14 @@
 # gh-co.nvim
 
-Github CODEOWNERS plugin for neovim.
+[Github CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) plugin for neovim. This plugin will help you identify code ownership for the files you are editing or you can identify the owners in your Git history.
+
+## Installation
+
+### Plug
+
+The plugin has standard structure so any method should work fine. I personally use [vim.plug](https://github.com/junegunn/vim-plug), so adding this to your configuration file will work:
+
+`Plug 'comatroy/gh-co.nvim'`
 
 ## Features
 
@@ -10,6 +18,8 @@ Github CODEOWNERS plugin for neovim.
 * locate & open CODEOWNERS file
 
 ## API
+
+The plugin exposes several commands prefixed with `GhCo*`. There are no default key bindings for running these so it's up to you to configure it.
 
 ### `:GhCoHealthcheck`
 

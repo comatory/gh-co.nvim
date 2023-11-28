@@ -8,7 +8,7 @@
 
 The plugin has standard structure so any method should work fine. I personally use [vim.plug](https://github.com/junegunn/vim-plug), so adding this to your configuration file will work:
 
-`Plug 'comatroy/gh-co.nvim'`
+`Plug 'comatory/gh-co.nvim'`
 
 ## Features
 

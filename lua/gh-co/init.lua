@@ -47,7 +47,7 @@ function checkCodeownersFileExists()
 end
 
 M.healthcheck = function()
-  print('gh-co.nvim is OK!')
+  print('gh-co.nvim plugin loaded OK. Codeowners file path:', FS.cachedCodeownersFilePath or 'not found')
 end
 
 M.showCodeownersFile = function()

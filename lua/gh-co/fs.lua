@@ -82,21 +82,34 @@ FS.getCodeownersFilePath = function()
     "Directory " .. codeownerDirName .. " does not seem to exist."
   )
 
-  local codeownerFileName = nil
+  local codeownerFileNameWithinDefaultFolder = nil
   for name, kind in codeownerDirContents do
     if hasCodeownersFile(name, kind) then
-      codeownerFileName = name
+      codeownerFileNameWithinDefaultFolder = name
       break
     end
   end
 
-  if codeownerFileName == nil then return nil end
+  local codeownerFilePath = nil
 
-  local codeownerFilePath = codeownerDirName .. "/" .. codeownerFileName
+  -- handles case when project is storing CODEOWNERS file in root directory
+  if codeownerFileNameWithinDefaultFolder == nil then
+    for name, kind in vim.fs.dir(rootDirName) do
+      if hasCodeownersFile(name, kind) then
+        codeownerFilePath = rootDirName .. "/" .. name
+        FS.cachedCodeownersFilePath = codeownerFilePath
+        break
+      end
+    end
 
-  FS.cachedCodeownersFilePath = codeownerFilePath
+    return codeownerFilePath
+  else
+    codeownerFilePath = codeownerDirName .. "/" .. codeownerFileNameWithinDefaultFolder
 
-  return codeownerFilePath
+    FS.cachedCodeownersFilePath = codeownerFilePath
+
+    return codeownerFilePath
+  end
 end
 
 FS.openCodeownersFile = function()

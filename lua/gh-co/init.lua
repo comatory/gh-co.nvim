@@ -42,6 +42,10 @@ function writeBufferOwnerContents(buffer, owners)
   vim.api.nvim_set_current_buf(buffer)
 end
 
+function checkCodeownersFileExists()
+  assert(FS.cachedCodeownersFilePath, "Problem reading Codeowners file path. Try running :GhCoHealthcheck")
+end
+
 M.healthcheck = function()
   print('gh-co.nvim is OK!')
 end
@@ -59,6 +63,7 @@ M.status = function()
 end
 
 M.who = function()
+  checkCodeownersFileExists()
   local filePath = FS.getFilePath()
   local owners = CO.matchFilesToCodeowner({ filePath })
 
@@ -71,6 +76,7 @@ M.who = function()
 end
 
 M.whos = function()
+  checkCodeownersFileExists()
   local filePaths = FS.getFilePaths()
   local owners = CO.matchFilesToCodeowner(filePaths)
 
@@ -88,6 +94,7 @@ M.whos = function()
 end
 
 M.gitWho = function(sha)
+  checkCodeownersFileExists()
   local filePaths = G.getAffectedFiles(sha)
   local owners = CO.matchFilesToCodeowner(filePaths)
 

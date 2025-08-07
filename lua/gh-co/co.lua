@@ -10,11 +10,20 @@ local function buildEscapedPattern(rawPattern)
   return string.gsub(rawPattern, "%-", "%%-")
 end
 
+-- matches file path substrings
 local function isMatch(filePath, pathPattern)
   if pathPattern == nil or pathPattern == "" then return false end
   if isComment(pathPattern) then return false end
 
   return string.match(filePath, buildEscapedPattern(pathPattern)) ~= nil
+end
+
+-- Detects `*` pattern
+local function isGlobalMatch(pathPattern)
+  if pathPattern == nil or pathPattern == "" then return false end
+  if isComment(pathPattern) then return false end
+
+  return string.match(pathPattern, "*") ~= nil
 end
 
 local function collectCodeowners(group)
@@ -59,18 +68,21 @@ CO.matchFilesToCodeowner = function(filePaths)
   local lines = FS.openCodeownersFileAsLines()
 
   local matches = {}
+  local globalCodeowners = nil
   for line, _, __ in lines do
     local split = vim.split(line, " ")
     local pathPattern = split[1]
 
     for _, filePath in ipairs(filePaths) do
       if isMatch(filePath, pathPattern) then
-        local codeowners = collectCodeowners(split)
-        table.insert(matches, { pathPattern = pathPattern, codeowners = codeowners })
+        table.insert(matches, { pathPattern = pathPattern, codeowners = collectCodeowners(split) })
+      elseif isGlobalMatch(pathPattern) then
+        globalCodeowners = collectCodeowners(split)
       end
     end
   end
 
+  if #matches == 0 and globalCodeowners ~= nil and #globalCodeowners ~= 0 then return globalCodeowners end
   if #matches == 0 then return {} end
 
   sortMatches(matches)

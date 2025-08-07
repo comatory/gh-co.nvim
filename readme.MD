@@ -16,6 +16,7 @@ The plugin has standard structure so any method should work fine. I personally u
 * show codeowners for all opened buffers
 * show codeowners for specific git commit via SHA
 * locate & open CODEOWNERS file
+* syntax highlighting for CODEOWNERS files
 
 ## API
 

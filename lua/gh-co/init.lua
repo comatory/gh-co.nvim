@@ -4,7 +4,7 @@ local G = require('gh-co.git')
 
 local M = {}
 
-function createNamedBuffer(name)
+local function createNamedBuffer(name)
   local buffer = vim.api.nvim_create_buf(true, true)
 
   if buffer == 0 then return nil end
@@ -14,7 +14,7 @@ function createNamedBuffer(name)
   return buffer
 end
 
-function getBufferHandleByName(name)
+local function getBufferHandleByName(name)
   for buffer = 1, vim.fn.bufnr('$') do
     if vim.api.nvim_buf_is_valid(buffer) then
       local bufferName = vim.api.nvim_buf_get_name(buffer)
@@ -24,9 +24,9 @@ function getBufferHandleByName(name)
   end
 end
 
-function writeBufferOwnerContents(buffer, owners)
+local function writeBufferOwnerContents(buffer, owners)
   local lineCount = vim.api.nvim_buf_line_count(buffer)
-  vim.api.nvim_buf_set_option(buffer, 'modifiable', true)
+  vim.bo[buffer].modifiable = true
   vim.api.nvim_buf_set_lines(buffer, 0, lineCount, false, {})
 
   if #owners > 0 then
@@ -35,14 +35,13 @@ function writeBufferOwnerContents(buffer, owners)
     end
   else
     vim.api.nvim_buf_set_lines(buffer, 0, 1, false, { '[no owners detected]' })
-
   end
 
-  vim.api.nvim_buf_set_option(buffer, 'modifiable', false)
+  vim.bo[buffer].modifiable = false
   vim.api.nvim_set_current_buf(buffer)
 end
 
-function checkCodeownersFileExists()
+local function checkCodeownersFileExists()
   assert(FS.cachedCodeownersFilePath, "Problem reading Codeowners file path. Try running :GhCoHealthcheck")
 end
 
@@ -67,7 +66,7 @@ M.who = function()
   local filePath = FS.getFilePath()
   local owners = CO.matchFilesToCodeowner({ filePath })
 
-  str = ""
+  local str = ""
   for _, owner in ipairs(owners) do
     str = str .. " " .. owner
   end
@@ -114,6 +113,21 @@ end
 M.init = function()
   -- cache path to codeowners path
   FS.getCodeownersFilePath()
+
+  -- setup filetype detection and syntax highlighting for CODEOWNERS files
+  local group = vim.api.nvim_create_augroup("GhCoCodeowners", { clear = true })
+  vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    group = group,
+    pattern = { "CODEOWNERS", "*/CODEOWNERS", ".github/CODEOWNERS", "docs/CODEOWNERS" },
+    callback = function(args)
+      local bufnr = args.buf
+      vim.bo[bufnr].filetype = 'codeowners'
+
+      -- Apply syntax highlighting
+      local syntax = require('gh-co.syntax')
+      syntax.setup_codeowners_syntax(bufnr)
+    end,
+  })
 
   -- commands
   vim.cmd("command! -bang -nargs=0 GhCoHealthcheck :lua require('gh-co').healthcheck()")

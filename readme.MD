@@ -4,11 +4,9 @@
 
 ## Installation
 
-### Plug
-
 The plugin has standard structure so any method should work fine.
 
-#### `[lazy.nvim](https://github.com/folke/lazy.nvim)`
+### [`lazy.nvim`](https://github.com/folke/lazy.nvim)
 
 ```lua
 -- ~/.config/nvim/lua/plugins/gh-co.lua
@@ -20,7 +18,7 @@ return {
 }
 ```
 
-#### `[vim.plug](https://github.com/junegunn/vim-plug)`
+### [`vim.plug`](https://github.com/junegunn/vim-plug)
 
 `Plug 'comatory/gh-co.nvim'`
 

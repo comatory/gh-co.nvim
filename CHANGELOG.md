@@ -1,3 +1,6 @@
+## v0.0.4
+- syntax highlighting for `CODEOWNERS` file
+
 ## v0.0.3
 
 - fixes a wildcard/catch-all pattern `* <owner-1> <owner-2>` not being recognized

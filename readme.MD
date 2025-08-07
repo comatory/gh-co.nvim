@@ -6,7 +6,21 @@
 
 ### Plug
 
-The plugin has standard structure so any method should work fine. I personally use [vim.plug](https://github.com/junegunn/vim-plug), so adding this to your configuration file will work:
+The plugin has standard structure so any method should work fine.
+
+#### `[lazy.nvim](https://github.com/folke/lazy.nvim)`
+
+```lua
+-- ~/.config/nvim/lua/plugins/gh-co.lua
+return {
+  "comatory/gh-co.nvim",
+  config = function()
+     vim.keymap.set("n", "<leader>gg", ":GhCoWho<CR>", {})
+  end
+}
+```
+
+#### `[vim.plug](https://github.com/junegunn/vim-plug)`
 
 `Plug 'comatory/gh-co.nvim'`
 

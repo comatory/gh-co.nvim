@@ -211,4 +211,19 @@ function TestCO:testCombinedWithGlobalPattern() -- luacheck: ignore 212
   lu.assertEquals(result3, {"@global-owner"})
 end
 
+function TestCO:testAppsDirectoryPattern() -- luacheck: ignore 212
+  -- Test apps/ pattern matches files in apps directory
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"apps/ @octocat"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"apps/web/index.js", "apps/mobile/main.kt"})
+  lu.assertEquals(result, {"@octocat"})
+end
+
 os.exit(lu.LuaUnit.run())

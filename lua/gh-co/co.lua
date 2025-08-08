@@ -11,10 +11,17 @@ local function buildEscapedPattern(rawPattern)
   local escaped = string.gsub(rawPattern, "([%-%+%?%(%)])", "%%%1")
   -- Convert * to match any character except /
   escaped = string.gsub(escaped, "%*", "[^/]*")
-  -- Anchor pattern to match from start if it doesn't begin with /
-  if not string.match(escaped, "^/") then
+  
+  -- Handle trailing slash - directory patterns should match everything within
+  if string.match(escaped, "/$") then
+    -- Remove trailing slash and match anything that starts with this path
+    escaped = string.gsub(escaped, "/$", "/")
+    -- Don't anchor with $ - allow matching subdirectories
+  elseif not string.match(escaped, "^/") then
+    -- Anchor non-directory patterns to match exactly
     escaped = escaped .. "$"
   end
+  
   return escaped
 end
 

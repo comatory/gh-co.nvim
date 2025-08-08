@@ -7,7 +7,15 @@ local function isComment(pathPattern)
 end
 
 local function buildEscapedPattern(rawPattern)
-  return string.gsub(rawPattern, "%-", "%%-")
+  -- Escape Lua pattern special characters except *
+  local escaped = string.gsub(rawPattern, "([%-%+%?%(%)])", "%%%1")
+  -- Convert * to match any character except /
+  escaped = string.gsub(escaped, "%*", "[^/]*")
+  -- Anchor pattern to match from start if it doesn't begin with /
+  if not string.match(escaped, "^/") then
+    escaped = escaped .. "$"
+  end
+  return escaped
 end
 
 -- matches file path substrings
@@ -15,15 +23,16 @@ local function isMatch(filePath, pathPattern)
   if pathPattern == nil or pathPattern == "" then return false end
   if isComment(pathPattern) then return false end
 
-  return string.match(filePath, buildEscapedPattern(pathPattern)) ~= nil
+  local pattern = buildEscapedPattern(pathPattern)
+  return string.match(filePath, pattern) ~= nil
 end
 
--- Detects `*` pattern
+-- Detects `*` pattern (global match - only exact "*")
 local function isGlobalMatch(pathPattern)
   if pathPattern == nil or pathPattern == "" then return false end
   if isComment(pathPattern) then return false end
 
-  return string.match(pathPattern, "*") ~= nil
+  return pathPattern == "*"
 end
 
 local function collectCodeowners(group)
@@ -74,10 +83,10 @@ CO.matchFilesToCodeowner = function(filePaths)
     local pathPattern = split[1]
 
     for _, filePath in ipairs(filePaths) do
-      if isMatch(filePath, pathPattern) then
-        table.insert(matches, { pathPattern = pathPattern, codeowners = collectCodeowners(split) })
-      elseif isGlobalMatch(pathPattern) then
+      if isGlobalMatch(pathPattern) then
         globalCodeowners = collectCodeowners(split)
+      elseif isMatch(filePath, pathPattern) then
+        table.insert(matches, { pathPattern = pathPattern, codeowners = collectCodeowners(split) })
       end
     end
   end

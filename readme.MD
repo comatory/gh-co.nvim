@@ -57,3 +57,19 @@ Show codeowners for files in all buffers.
 ### `:GhCoGitWho <SHA>`
 
 Show codeowners for files affected by commit SHA.
+
+## Development
+
+Project is using luarocks to manage dependencies. After cloning the repo run:
+
+```bash
+luarocks install --deps-only gh-co.nvim-0.0.4-1.rockspec
+```
+
+### Lint
+
+Run `PATH="./lua_modules/bin:PATH" luacheck lua` to lint the codebase
+
+### Test
+
+TBD

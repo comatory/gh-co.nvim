@@ -91,4 +91,49 @@ function TestCO:testGlobalPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@global-owner1", "@global-owner2"})
 end
 
+function TestCO:testJavaScriptPattern() -- luacheck: ignore 212
+  -- Test *.js pattern matches JavaScript files
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"*.js @js-owner"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"app.js", "utils.js"})
+  lu.assertEquals(result, {"@js-owner"})
+end
+
+function TestCO:testGoPattern() -- luacheck: ignore 212
+  -- Test *.go pattern matches Go files
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"*.go docs@example.com"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"main.go", "server.go"})
+  lu.assertEquals(result, {"docs@example.com"})
+end
+
+function TestCO:testTxtPattern() -- luacheck: ignore 212
+  -- Test *.txt pattern matches text files with team owner
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"*.txt @octo-org/octocats"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"README.txt", "notes.txt"})
+  lu.assertEquals(result, {"@octo-org/octocats"})
+end
+
 os.exit(lu.LuaUnit.run())

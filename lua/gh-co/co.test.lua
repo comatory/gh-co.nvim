@@ -256,4 +256,19 @@ function TestCO:testRootScriptsDirectoryPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@doctocat", "@octocat"})
 end
 
+function TestCO:testDoubleStarLogsPattern() -- luacheck: ignore 212
+  -- Test **/logs pattern matches any logs directory at any depth
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"**/logs @octocat"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"build/logs/error.log", "app/server/logs/access.log", "logs/debug.log"})
+  lu.assertEquals(result, {"@octocat"})
+end
+
 os.exit(lu.LuaUnit.run())

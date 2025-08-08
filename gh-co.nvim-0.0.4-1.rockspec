@@ -12,7 +12,10 @@ description = {
 }
 dependencies = {
    "lua >= 5.1",
-   "luacheck"
+   "luacheck",
+}
+test_dependencies = {
+   "luaunit >= 3.4"
 }
 build = {
    type = "builtin",
@@ -23,4 +26,8 @@ build = {
       ["gh-co.init"] = "lua/gh-co/init.lua",
       ["gh-co.syntax"] = "lua/gh-co/syntax.lua"
    }
+}
+test = {
+  type = "command",
+  command = "lua -l lua/setup lua/gh-co/co.test.lua -o TAP"
 }

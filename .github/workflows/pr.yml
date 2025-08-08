@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  lint:
+  checks:
     runs-on: ubuntu-latest
     
     steps:
@@ -22,5 +22,8 @@ jobs:
     - name: Install dependencies
       run: luarocks install --deps-only gh-co.nvim-0.0.4-1.rockspec
     
-    - name: Run linter
+    - name: Lint
       run: PATH="./lua_modules/bin:$PATH" luacheck lua
+
+    - name: Test
+      run: luarocks test

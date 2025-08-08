@@ -1,4 +1,11 @@
+## v0.0.5
+
+- add luarocks & unit tests
+- fix incompatibility with CODEOWNERS spec, the plugin can now work with various patterns, can handle paths marked with no owner(s) or wildcard patterns
+- fix highlighting, add treesitter support
+
 ## v0.0.4
+
 - syntax highlighting for `CODEOWNERS` file
 
 ## v0.0.3

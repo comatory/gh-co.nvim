@@ -72,4 +72,4 @@ Run `PATH="./lua_modules/bin:PATH" luacheck lua` to lint the codebase
 
 ### Test
 
-TBD
+Run `luarocks test`

@@ -5,8 +5,14 @@ local function setup_highlight_groups()
   vim.api.nvim_set_hl(0, "CodeownersComment", { link = "Comment" })
   vim.api.nvim_set_hl(0, "CodeownersPath", { link = "Identifier" })
   vim.api.nvim_set_hl(0, "CodeownersGlobalPath", { link = "Special" })
-  vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "String" })
-  vim.api.nvim_set_hl(0, "CodeownersEmail", { link = "Constant" })
+
+  -- Try to use treesitter highlight groups for better theming
+  local has_treesitter = pcall(require, 'nvim-treesitter')
+  if has_treesitter and vim.fn.hlexists("@string.special") == 1 then
+    vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "@string.special" })
+  else
+    vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "String" })
+  end
 end
 
 local function highlight_line(bufnr, line_num, line_content)

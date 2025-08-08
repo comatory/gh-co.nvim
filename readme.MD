@@ -25,7 +25,7 @@ return {
 
 `Plug 'comatory/gh-co.nvim'`
 
-### Quick start
+## Quick start
 
 1. Open repository that has `CODEOWNERS` file. Check that it's accessible using `:GhCoShowFile`.
 2. Open a file, run `:GhCoWho`. You will see codeowner(s) in the bottom panel as a message.

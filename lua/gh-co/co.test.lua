@@ -226,4 +226,19 @@ function TestCO:testAppsDirectoryPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@octocat"})
 end
 
+function TestCO:testRootDocsDirectoryPattern() -- luacheck: ignore 212
+  -- Test /docs/ pattern matches files in root docs directory
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"/docs/ @doctocat"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"/docs/api.md", "/docs/guides/setup.md"})
+  lu.assertEquals(result, {"@doctocat"})
+end
+
 os.exit(lu.LuaUnit.run())

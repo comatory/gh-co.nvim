@@ -1,5 +1,8 @@
 # gh-co.nvim
 
+![gh-co demo](gh-co.gif)
+*Observe messages in bottom panel to see the codeowners of the file*
+
 [Github CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) plugin for neovim. This plugin will help you identify code ownership for the files you are editing or you can identify the owners in your Git history.
 
 ## Installation
@@ -21,6 +24,13 @@ return {
 ### [`vim.plug`](https://github.com/junegunn/vim-plug)
 
 `Plug 'comatory/gh-co.nvim'`
+
+### Quick start
+
+1. Open repository that has `CODEOWNERS` file. Check that it's accessible using `:GhCoShowFile`.
+2. Open a file, run `:GhCoWho`. You will see codeowner(s) in the bottom panel as a message.
+3. Open few different files with different owners, run `:GhCoWhos`, a new buffer with all the codeowners will be shown.
+4. Get a git commit SHA from the repository history, run `:GhCoGitWho <sha>` to get a list of codeowners which affected given commit.
 
 ## Features
 

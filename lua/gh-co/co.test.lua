@@ -86,7 +86,7 @@ function TestCO:testGlobalPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"README.md", "src/main.js"})
   lu.assertEquals(result, {"@global-owner1", "@global-owner2"})
 end
@@ -101,7 +101,7 @@ function TestCO:testJavaScriptPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"app.js", "utils.js"})
   lu.assertEquals(result, {"@js-owner"})
 end
@@ -116,7 +116,7 @@ function TestCO:testGoPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"main.go", "server.go"})
   lu.assertEquals(result, {"docs@example.com"})
 end
@@ -131,7 +131,7 @@ function TestCO:testTxtPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"README.txt", "notes.txt"})
   lu.assertEquals(result, {"@octo-org/octocats"})
 end
@@ -146,7 +146,7 @@ function TestCO:testBuildLogsDirectoryPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"/build/logs/app.log", "/build/logs/error.log"})
   lu.assertEquals(result, {"@doctocat"})
 end
@@ -161,7 +161,7 @@ function TestCO:testDocsWildcardPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"docs/README.md", "docs/guide.txt"})
   lu.assertEquals(result, {"docs@example.com"})
 end
@@ -176,7 +176,7 @@ function TestCO:testDocsWildcardDoesNotMatchSubdirectories() -- luacheck: ignore
       return lines[i]
     end
   end
-  
+
   -- Debug: Test what the pattern should do
   -- docs/* should match "docs/readme.md" but NOT "docs/sub/readme.md"
   local result = CO.matchFilesToCodeowner({"docs/sub/readme.md"})
@@ -197,15 +197,15 @@ function TestCO:testCombinedWithGlobalPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   -- JS files should match specific owner (*.js overrides *)
   local result1 = CO.matchFilesToCodeowner({"app.js"})
   lu.assertEquals(result1, {"@js-owner"})
-  
+
   -- Docs files should match docs owner (docs/* overrides *)
   local result2 = CO.matchFilesToCodeowner({"docs/README.md"})
   lu.assertEquals(result2, {"docs@example.com"})
-  
+
   -- Files with no specific pattern should fall back to global owner
   local result3 = CO.matchFilesToCodeowner({"README.py"})
   lu.assertEquals(result3, {"@global-owner"})
@@ -221,7 +221,7 @@ function TestCO:testAppsDirectoryPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"apps/web/index.js", "apps/mobile/main.kt"})
   lu.assertEquals(result, {"@octocat"})
 end
@@ -236,7 +236,7 @@ function TestCO:testRootDocsDirectoryPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"/docs/api.md", "/docs/guides/setup.md"})
   lu.assertEquals(result, {"@doctocat"})
 end
@@ -251,7 +251,7 @@ function TestCO:testRootScriptsDirectoryPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"/scripts/deploy.sh", "/scripts/test.py"})
   lu.assertEquals(result, {"@doctocat", "@octocat"})
 end
@@ -266,7 +266,7 @@ function TestCO:testDoubleStarLogsPattern() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   local result = CO.matchFilesToCodeowner({"build/logs/error.log", "app/server/logs/access.log", "logs/debug.log"})
   lu.assertEquals(result, {"@octocat"})
 end
@@ -284,7 +284,7 @@ function TestCO:testAppsWithEmptyGithubSubdirectory() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   -- Files in /apps/github should have no owners (empty pattern overrides /apps/)
   local githubResult = CO.matchFilesToCodeowner({"/apps/github/readme.md"})
   lu.assertEquals(githubResult, {})
@@ -303,7 +303,7 @@ function TestCO:testAppsWithGithubSubdirectoryOwner() -- luacheck: ignore 212
       return lines[i]
     end
   end
-  
+
   -- Files in /apps/github should have @doctocat (overrides /apps/)
   local githubResult = CO.matchFilesToCodeowner({"/apps/github/readme.md"})
   lu.assertEquals(githubResult, {"@doctocat"})

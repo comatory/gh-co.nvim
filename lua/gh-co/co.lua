@@ -9,22 +9,22 @@ end
 local function buildEscapedPattern(rawPattern)
   -- Escape Lua pattern special characters except *
   local escaped = string.gsub(rawPattern, "([%-%+%?%(%)])", "%%%1")
-  
+
   -- Handle ** first (before single *) - use placeholder to avoid conflicts
   escaped = string.gsub(escaped, "%*%*", "__DOUBLESTAR__")
-  
+
   -- Convert remaining * to match any character except /
   escaped = string.gsub(escaped, "%*", "[^/]*")
-  
+
   -- Replace placeholder with pattern that matches any path including /
   escaped = string.gsub(escaped, "__DOUBLESTAR__", ".*")
-  
+
   -- Special handling for **/name patterns - they should match directories
   if string.match(rawPattern, "%*%*/[^/]+$") then
     -- **/logs should match files within logs directories
     escaped = escaped .. "/"
   end
-  
+
   -- Handle trailing slash - directory patterns should match everything within
   if string.match(escaped, "/$") then
     -- Remove trailing slash and match anything that starts with this path
@@ -34,7 +34,7 @@ local function buildEscapedPattern(rawPattern)
     -- Anchor non-directory patterns to match exactly
     escaped = escaped .. "$"
   end
-  
+
   return escaped
 end
 
@@ -126,7 +126,7 @@ CO.matchFilesToCodeowner = function(filePaths)
       break -- Since sorted by length, we can break early
     end
   end
-  
+
   local codeownersList = mapCodeowners(mostSpecificMatches)
   return codeownersList
 end

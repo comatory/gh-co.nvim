@@ -76,4 +76,19 @@ function TestCO:testMatchFilesToCodeownerEmpty() -- luacheck: ignore 212
   lu.assertEquals(result, {})
 end
 
+function TestCO:testGlobalPattern() -- luacheck: ignore 212
+  -- Test * pattern matches all files and assigns global owners
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"* @global-owner1 @global-owner2"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"README.md", "src/main.js"})
+  lu.assertEquals(result, {"@global-owner1", "@global-owner2"})
+end
+
 os.exit(lu.LuaUnit.run())

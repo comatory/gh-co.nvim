@@ -7,7 +7,35 @@ local function isComment(pathPattern)
 end
 
 local function buildEscapedPattern(rawPattern)
-  return string.gsub(rawPattern, "%-", "%%-")
+  -- Escape Lua pattern special characters except *
+  local escaped = string.gsub(rawPattern, "([%-%+%?%(%)])", "%%%1")
+
+  -- Handle ** first (before single *) - use placeholder to avoid conflicts
+  escaped = string.gsub(escaped, "%*%*", "__DOUBLESTAR__")
+
+  -- Convert remaining * to match any character except /
+  escaped = string.gsub(escaped, "%*", "[^/]*")
+
+  -- Replace placeholder with pattern that matches any path including /
+  escaped = string.gsub(escaped, "__DOUBLESTAR__", ".*")
+
+  -- Special handling for **/name patterns - they should match directories
+  if string.match(rawPattern, "%*%*/[^/]+$") then
+    -- **/logs should match files within logs directories
+    escaped = escaped .. "/"
+  end
+
+  -- Handle trailing slash - directory patterns should match everything within
+  if string.match(escaped, "/$") then
+    -- Remove trailing slash and match anything that starts with this path
+    escaped = string.gsub(escaped, "/$", "/")
+    -- Don't anchor with $ - allow matching subdirectories
+  elseif not string.match(escaped, "^/") then
+    -- Anchor non-directory patterns to match exactly
+    escaped = escaped .. "$"
+  end
+
+  return escaped
 end
 
 -- matches file path substrings
@@ -15,15 +43,16 @@ local function isMatch(filePath, pathPattern)
   if pathPattern == nil or pathPattern == "" then return false end
   if isComment(pathPattern) then return false end
 
-  return string.match(filePath, buildEscapedPattern(pathPattern)) ~= nil
+  local pattern = buildEscapedPattern(pathPattern)
+  return string.match(filePath, pattern) ~= nil
 end
 
--- Detects `*` pattern
+-- Detects `*` pattern (global match - only exact "*")
 local function isGlobalMatch(pathPattern)
   if pathPattern == nil or pathPattern == "" then return false end
   if isComment(pathPattern) then return false end
 
-  return string.match(pathPattern, "*") ~= nil
+  return pathPattern == "*"
 end
 
 local function collectCodeowners(group)
@@ -74,10 +103,10 @@ CO.matchFilesToCodeowner = function(filePaths)
     local pathPattern = split[1]
 
     for _, filePath in ipairs(filePaths) do
-      if isMatch(filePath, pathPattern) then
-        table.insert(matches, { pathPattern = pathPattern, codeowners = collectCodeowners(split) })
-      elseif isGlobalMatch(pathPattern) then
+      if isGlobalMatch(pathPattern) then
         globalCodeowners = collectCodeowners(split)
+      elseif isMatch(filePath, pathPattern) then
+        table.insert(matches, { pathPattern = pathPattern, codeowners = collectCodeowners(split) })
       end
     end
   end
@@ -87,8 +116,18 @@ CO.matchFilesToCodeowner = function(filePaths)
 
   sortMatches(matches)
 
-  local codeownersList = mapCodeowners(matches)
+  -- Only use the most specific pattern(s) - those with the longest pathPattern
+  local maxLength = #matches[1].pathPattern
+  local mostSpecificMatches = {}
+  for _, match in ipairs(matches) do
+    if #match.pathPattern == maxLength then
+      table.insert(mostSpecificMatches, match)
+    else
+      break -- Since sorted by length, we can break early
+    end
+  end
 
+  local codeownersList = mapCodeowners(mostSpecificMatches)
   return codeownersList
 end
 

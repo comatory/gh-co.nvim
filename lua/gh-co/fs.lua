@@ -60,7 +60,9 @@ FS.getCodeownersFilePath = function()
 
   local rootDirContents = vim.fs.dir(rootDirName)
 
-  assert(rootDirContents, "Not able to detect project root directory. Maybe you should run nvim from the root of the project.")
+  assert(rootDirContents, [[
+    Not able to detect project root directory. Maybe you should run nvim from the root of the project.
+  ]])
 
   local githubDirName = nil
   local docsDirName = nil

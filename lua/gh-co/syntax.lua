@@ -5,8 +5,14 @@ local function setup_highlight_groups()
   vim.api.nvim_set_hl(0, "CodeownersComment", { link = "Comment" })
   vim.api.nvim_set_hl(0, "CodeownersPath", { link = "Identifier" })
   vim.api.nvim_set_hl(0, "CodeownersGlobalPath", { link = "Special" })
-  vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "String" })
-  vim.api.nvim_set_hl(0, "CodeownersEmail", { link = "Constant" })
+
+  -- Try to use treesitter highlight groups for better theming
+  local has_treesitter = pcall(require, 'nvim-treesitter')
+  if has_treesitter and vim.fn.hlexists("@string.special") == 1 then
+    vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "@string.special" })
+  else
+    vim.api.nvim_set_hl(0, "CodeownersOwner", { link = "String" })
+  end
 end
 
 local function highlight_line(bufnr, line_num, line_content)
@@ -56,22 +62,17 @@ local function highlight_line(bufnr, line_num, line_content)
 
   for i = 2, #parts do
     local owner = parts[i]
-    local owner_start = remaining_line:find(vim.pesc(owner), 1, true)
+    local owner_start = remaining_line:find(owner, 1, true)
 
     if owner_start then
       local actual_start = offset + owner_start - 1
       local actual_end = actual_start + #owner
 
       -- Determine highlight group based on owner format
-      if owner:match("^@[%w_%-]+/[%w_%-]+$") or owner:match("^@[%w_%-]+$") then
+      if owner:find("@") then
         vim.api.nvim_buf_set_extmark(bufnr, ns_id, line_num, actual_start, {
           end_col = actual_end,
           hl_group = "CodeownersOwner"
-        })
-      elseif owner:match("^[%w%.%%_%+%-]+@[%w%.%-]+%.[%w]+$") then
-        vim.api.nvim_buf_set_extmark(bufnr, ns_id, line_num, actual_start, {
-          end_col = actual_end,
-          hl_group = "CodeownersEmail"
         })
       end
 

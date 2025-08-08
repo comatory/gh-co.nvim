@@ -1,0 +1,26 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v10
+      with:
+        luaVersion: "5.4"
+    
+    - name: Setup LuaRocks
+      uses: leafo/gh-actions-luarocks@v4
+    
+    - name: Install dependencies
+      run: luarocks install --deps-only gh-co.nvim-0.0.4-1.rockspec
+    
+    - name: Run linter
+      run: PATH="./lua_modules/bin:$PATH" luacheck lua

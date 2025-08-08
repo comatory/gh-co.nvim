@@ -241,4 +241,19 @@ function TestCO:testRootDocsDirectoryPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@doctocat"})
 end
 
+function TestCO:testRootScriptsDirectoryPattern() -- luacheck: ignore 212
+  -- Test /scripts/ pattern with multiple owners
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"/scripts/ @doctocat @octocat"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"/scripts/deploy.sh", "/scripts/test.py"})
+  lu.assertEquals(result, {"@doctocat", "@octocat"})
+end
+
 os.exit(lu.LuaUnit.run())

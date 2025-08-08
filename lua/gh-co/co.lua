@@ -116,8 +116,18 @@ CO.matchFilesToCodeowner = function(filePaths)
 
   sortMatches(matches)
 
-  local codeownersList = mapCodeowners(matches)
-
+  -- Only use the most specific pattern(s) - those with the longest pathPattern
+  local maxLength = #matches[1].pathPattern
+  local mostSpecificMatches = {}
+  for _, match in ipairs(matches) do
+    if #match.pathPattern == maxLength then
+      table.insert(mostSpecificMatches, match)
+    else
+      break -- Since sorted by length, we can break early
+    end
+  end
+  
+  local codeownersList = mapCodeowners(mostSpecificMatches)
   return codeownersList
 end
 

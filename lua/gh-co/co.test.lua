@@ -271,4 +271,23 @@ function TestCO:testDoubleStarLogsPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@octocat"})
 end
 
+function TestCO:testAppsWithEmptyGithubSubdirectory() -- luacheck: ignore 212
+  -- Test /apps/ with empty /apps/github (no owners)
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {
+      "/apps/ @octocat",
+      "/apps/github"
+    }
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  -- Files in /apps/github should have no owners (empty pattern overrides /apps/)
+  local githubResult = CO.matchFilesToCodeowner({"/apps/github/readme.md"})
+  lu.assertEquals(githubResult, {})
+end
+
 os.exit(lu.LuaUnit.run())

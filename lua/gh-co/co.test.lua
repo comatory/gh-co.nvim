@@ -136,4 +136,19 @@ function TestCO:testTxtPattern() -- luacheck: ignore 212
   lu.assertEquals(result, {"@octo-org/octocats"})
 end
 
+function TestCO:testBuildLogsDirectoryPattern() -- luacheck: ignore 212
+  -- Test /build/logs/ pattern matches files in specific directory
+  self.FS.openCodeownersFileAsLines = function()
+    local lines = {"/build/logs/ @doctocat"}
+    local i = 0
+    return function()
+      i = i + 1
+      return lines[i]
+    end
+  end
+  
+  local result = CO.matchFilesToCodeowner({"/build/logs/app.log", "/build/logs/error.log"})
+  lu.assertEquals(result, {"@doctocat"})
+end
+
 os.exit(lu.LuaUnit.run())

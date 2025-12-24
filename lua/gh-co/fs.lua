@@ -15,7 +15,7 @@ end
 local function getRootDirectoryName(currentPath)
   local dir = vim.fs.dirname(
     vim.fs.find(
-      { ".github", "docs" },
+      { ".github", "docs", "CODEOWNERS" },
       {
         path = currentPath,
         upward = true
@@ -78,12 +78,14 @@ FS.getCodeownersFilePath = function()
   end
 
   local codeownerFilePath = nil
+  -- picking the best matching CODEOWNERS file according to priority
+  -- https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#codeowners-file-location
   if hasGithubDir and hasCodeownersFile(rootDirName .. '/.github') then
     codeownerFilePath = rootDirName .. '/.github/CODEOWNERS'
-  elseif hasDocsDir and hasCodeownersFile(rootDirName .. '/docs') then
-    codeownerFilePath = rootDirName .. '/docs/CODEOWNERS'
   elseif hasRootCodeowners then
     codeownerFilePath = rootDirName .. '/CODEOWNERS'
+  elseif hasDocsDir and hasCodeownersFile(rootDirName .. '/docs') then
+    codeownerFilePath = rootDirName .. '/docs/CODEOWNERS'
   end
 
   FS.cachedCodeownersFilePath = codeownerFilePath

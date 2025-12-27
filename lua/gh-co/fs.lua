@@ -79,6 +79,7 @@ FS.getCodeownersFilePath = function()
 
   local codeownerFilePath = nil
   -- picking the best matching CODEOWNERS file according to priority
+  -- luacheck: ignore 631
   -- https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#codeowners-file-location
   if hasGithubDir and hasCodeownersFile(rootDirName .. '/.github') then
     codeownerFilePath = rootDirName .. '/.github/CODEOWNERS'

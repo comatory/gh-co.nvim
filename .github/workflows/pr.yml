@@ -20,7 +20,7 @@ jobs:
       uses: leafo/gh-actions-luarocks@v4
     
     - name: Install dependencies
-      run: luarocks install --deps-only gh-co.nvim-0.0.5-1.rockspec
+      run: luarocks install --deps-only gh-co.nvim-0.0.6-1.rockspec
     
     - name: Lint
       run: PATH="./lua_modules/bin:$PATH" luacheck lua

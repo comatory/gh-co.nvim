@@ -1,3 +1,7 @@
+## v0.0.6
+
+- fix crash on the startup with empty `docs` folder #8
+
 ## v0.0.5
 
 - add luarocks & unit tests

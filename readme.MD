@@ -73,7 +73,7 @@ Show codeowners for files affected by commit SHA.
 Project is using luarocks to manage dependencies. After cloning the repo run:
 
 ```bash
-luarocks install --deps-only gh-co.nvim-0.0.5-1.rockspec
+luarocks install --deps-only gh-co.nvim-0.0.6-1.rockspec
 ```
 
 ### Lint
